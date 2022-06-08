@@ -21,6 +21,9 @@ class Move():
     def resign(cls):
         return Move(is_resignation=True)
 
+    @property
+    def is_play(self):
+        return not self.is_pass and not self.is_resignation
 
 class GoString():
     def __init__(self, color, stones, liberties):
@@ -106,8 +109,8 @@ class Board():
 
     def _remove_string(self, go_string):
         for point in go_string.stones:
-            for neighbor in point.neighbors:
-                neighbor_string = self._grid[neighbor]
+            for neighbor in point.neighbors():
+                neighbor_string = self._grid.get(neighbor)
                 if neighbor_string is None:
                     continue
                 if neighbor_string == go_string:
@@ -130,7 +133,7 @@ class GameState():
             assert self.board.get(move.point) is None
             next_board = copy.deepcopy(self.board)
             next_board.place_stone(self.next_player, move.point)
-        return GameState(next_board, next_player.opposite, self, move)
+        return GameState(next_board, self.next_player.other, self, move)
 
     def is_over(self):
         if self.last_move is None:
@@ -140,7 +143,7 @@ class GameState():
         second_last_move = self.previous_state.last_move
         if second_last_move is None:
             return False
-        return second_last_move.is_pass and last_move.is_pass
+        return second_last_move.is_pass and self.last_move.is_pass
 
     def is_move_self_capture(self, player, move):
         if not move.is_play:
@@ -148,7 +151,7 @@ class GameState():
         board = copy.deepcopy(self.board)
         board.place_stone(player, move.point)
         go_string = board.get_go_string(move.point)
-        return go_string.num_liberties >= 0
+        return go_string.num_liberties == 0
 
     @property
     def situation(self):
@@ -179,7 +182,7 @@ class GameState():
         )
 
     @classmethod
-    def new(cls, board_size):
+    def new_game(cls, board_size):
         if isinstance(board_size, int):
             board_size = (board_size, board_size)
         board = Board(*board_size)

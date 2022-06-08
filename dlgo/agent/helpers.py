@@ -3,7 +3,7 @@ def is_point_an_eye(board, point, color):
     if board.get(point) is not None:
         return False
     # All adjacent points must be the same color.
-    for neighbor in point.neighbors:
+    for neighbor in point.neighbors():
         if board.is_on_grid(neighbor):
             neighbor_color = board.get(point)
             if neighbor_color != color:
