@@ -30,10 +30,10 @@ print('Go')
 
 game_state = game.GameState()
 
-game_state.apply_move(game.Point(col=2, row=2))
-game_state.apply_move(game.Point(col=3, row=2))
-game_state.apply_move(game.Point(col=3, row=1))
-game_state.apply_move(game.Point(col=3, row=3))
-game_state.apply_move(game.Point(col=1, row=3))
+game_state = game_state.apply_move(game.Point(col=2, row=2))
+game_state = game_state.apply_move(game.Point(col=3, row=2))
+game_state = game_state.apply_move(game.Point(col=3, row=1))
+game_state = game_state.apply_move(game.Point(col=3, row=3))
+game_state = game_state.apply_move(game.Point(col=1, row=3))
 
 print_board(game_state)

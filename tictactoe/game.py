@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+import copy
 import enum
 
 class Player(enum.Enum):
@@ -14,57 +15,64 @@ class Player(enum.Enum):
 class Point(namedtuple('Point', 'row col')):
     pass
 
+def check_winner(i, j, board, size, player):
+    win = True
+    for jj in range(size):
+        if board[i][jj] != player:
+            win = False
+            break
+    if win:
+        return True
+    win = True
+    for ii in range(size):
+        if board[ii][j] != player:
+            win = False
+            break
+    if win:
+        return True
+    win = True
+    for ii in range(size):
+        if board[ii][ii] != player:
+            win = False
+            break
+    if win:
+        return True
+    win = True
+    for ii in range(size):
+        if board[ii][size - 1 - ii] != player:
+            win = False
+            break
+    return win
+
 class GameState():
-    def __init__(self, size = 3):
+    def __init__(self, size = 3, board = None, player = Player.x, winner = None):
         self.size = 3
-        self.board = [[None for i in range(size)] for j in range(size)]
-        self.next_player = Player.x
-        self.winner = None
+        if board is None:
+            board = [[None for i in range(size)] for j in range(size)]
+        self.board = board
+        self.next_player = player
+        self.winner = winner
 
     def apply_move(self, move):
         i = move.row - 1
         j = move.col - 1
         assert self.board[i][j] is None
+
         player = self.next_player
-        self.next_player = player.opposite()
-        self.board[i][j] = player
-        # check row
-        win = True
-        for jj in range(self.size):
-            if self.board[i][jj] != player:
-                win = False
-                break
-        if win:
-            self.winner = player
-            return
-        win = True
-        for ii in range(self.size):
-            if self.board[ii][j] != player:
-                win = False
-                break
-        if win:
-            self.winner = player
-            return
-        win = True
-        for ii in range(self.size):
-            if self.board[ii][ii] != player:
-                win = False
-                break
-        if win:
-            self.winner = player
-            return
-        win = True
-        for ii in range(self.size):
-            if self.board[ii][self.size - 1 - ii] != player:
-                win = False
-                break
-        if win:
-            self.winner = player
-            return
+        board = copy.deepcopy(self.board)
+        board[i][j] = player
+        winner = None
+        if check_winner(i, j, board, self.size, player):
+            winner = player
+        return GameState(size = self.size, board = board, player = player.opposite(), winner=winner)
 
     def winner(self):
         return self.winner
 
+    def is_over(self):
+        if self.winner is not None:
+            return True
+        return all(self.board[i][j] is not None for i in range(self.size) for j in range(self.size))
 
     def legal_moves(self):
         result = []
