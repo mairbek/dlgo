@@ -51,7 +51,7 @@ class GameState():
             board = [[None for i in range(size)] for j in range(size)]
         self.board = board
         self.next_player = player
-        self.winner = winner
+        self._winner = winner
 
     def apply_move(self, move):
         i = move.row - 1
@@ -67,12 +67,17 @@ class GameState():
         return GameState(size = self.size, board = board, player = player.opposite(), winner=winner)
 
     def winner(self):
-        return self.winner
+        return self._winner
 
     def is_over(self):
-        if self.winner is not None:
+        if self._winner is not None:
             return True
-        return all(self.board[i][j] is not None for i in range(self.size) for j in range(self.size))
+        count = 0
+        for i in range(self.size):
+            for j in range(self.size):
+                if self.board[i][j] is None:
+                    count += 1
+        return count == 0
 
     def legal_moves(self):
         result = []
@@ -80,3 +85,4 @@ class GameState():
             for j in range(self.size):
                 if self.board[i][j] is None:
                     result.append(Point(row=i+1, col=j+1))
+        return result

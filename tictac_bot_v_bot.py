@@ -3,11 +3,6 @@
 from tictactoe import minimax
 from tictactoe import game
 
-def point_from_coords(coords):
-    col = int(coords[0])
-    row = int(coords[1:])
-    return game.Point(row=row, col=col)
-
 def print_board(game_state):
     n = game_state.size
     for i in range(n):
@@ -27,6 +22,7 @@ def print_board(game_state):
         print("Winner %s" % game_state.winner())
 
 bots = {
+    game.Player.x: minimax.MinimaxAgent(),
     game.Player.o: minimax.MinimaxAgent(),
 }
 
@@ -41,12 +37,8 @@ while True:
     if game_state.is_over():
         print('Over')
         break
-    bot = bots.get(player)
-    if bot is None:
-        human_move = input('-- ')
-        move = point_from_coords(human_move)
-    else:
-        move = bot.select_move(game_state)
+    bot = bots[player]
+    move = bot.select_move(game_state)
     game_state = game_state.apply_move(move)
     print_board(game_state)
     player = player.opposite()
