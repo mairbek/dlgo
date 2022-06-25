@@ -1,1 +1,3 @@
 __pycache__
+.tool-versions
+mnist.npz
