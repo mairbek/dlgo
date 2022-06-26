@@ -1,3 +1,5 @@
+import six.moves.cPickle as pickle
+
 import numpy as np
 
 def encode_label(j):
